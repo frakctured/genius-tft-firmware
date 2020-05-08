@@ -1,4 +1,9 @@
-﻿#--------------------------------------------------------------------
+#######################################################################
+# modded: May/2020
+# by https://t.me/frakctured
+#######################################################################
+
+#--------------------------------------------------------------------
 #########  Printer type setting  ##################################
 
 #mainboard firmware setting(marlin:1; repetier:2; smoothie:3)
@@ -15,7 +20,7 @@
 
 #languages setting
 #(simplified Chinese:1; traditional Chinese:2; English:3; Russian:4; Spanish:5). This configuration is valid when "cfg_multiple_language" is disabled.
->cfg_language_type:3
+>cfg_language_type:5
 
 #extruder number(one:1; dual:2)
 >cfg_sprayer_counter:1
@@ -42,7 +47,7 @@
 >cfg_insert_det_module:0
 
 #enable auto off after print finish function (no:0; Yes:1）
->cfg_print_finish_close_Machine:0
+>cfg_print_finish_close_Machine:1
 
 #set PB0 signal when use it for sencond nozzle (high level:1; low level:0)
 >cfg_PB0_trigger_Level:0
@@ -143,34 +148,50 @@ It will auto heat up if the current temp doesn't reach the target.
 
 
 #set number of  "More" button 
->moreitem_pic_cnt:5
+>moreitem_pic_cnt:7
 
 #edit command for 1~7 "More" button,each command must be separated by semicolon ";"
->moreitem_button1_cmd:M42 P4 S0;M42 P5 S0;M42 P6 S0;
 
->moreitem_button2_cmd:M42 P4 S255;M42 P5 S255;M42 P6 S255;
+#Autotuning del PID para extrusor y cama, según guía de https://t.me/ARTILLERY_X1_3D. Hace el cálculo y guarda en la Eeprom
+>moreitem_button1_cmd:M106 S255;G4 S1;M303 C8 E0 S200 U1;G4 S1;M303 C8 E-1 S60 U1;G4 S1;M500;G4 S1;M107;G4 S1;
 
->moreitem_button3_cmd:M42 P4 S0;M42 P5 S255;M42 P6 S0;
+# Inicio del Mesh Bed Leveling (MBL). Se sitúa en el primer punto del patron de nivelado de 9 puntos.
+>moreitem_button2_cmd:G29 S1;
 
->moreitem_button4_cmd:M42 P4 S255;M42 P5 S0;M42 P6 S0;
+# Subir Z .025
+>moreitem_button3_cmd:G91; G1 Z0.025; G90;M42 P4 S255;M42 P5 S0;M42 P6 S0;
 
->moreitem_button5_cmd:M42 P4 S0;M42 P5 S0;M42 P6 S255;
+#Guardar a la EEPROM. Leds (rojo -> verde)
+>moreitem_button4_cmd:M42 P4 S0;M42 P5 S255;M42 P6 S0;M500;G4 S1;M42 P4 S255;M42 P5 S0;M42 P6 S0;
 
->moreitem_button6_cmd:G28 Z0;
+#Precalentar para PLA. Leds (azul -> verde)
+>moreitem_button5_cmd:M42 P4 S0;M42 P5 S0;M42 P6 S255;M104 S205; M140 S60; G4 P500;M42 P4 S255;M42 P5 S0;M42 P6 S0;
 
->moreitem_button7_cmd:G28;
+#Siguiente punto del Mesh Bed Leveling (MBL). Se sitúa en el siguiente punto del patron de nivelado de 9 puntos.
+>moreitem_button6_cmd:G29 S2;
+
+# Bajar Z .025
+>moreitem_button7_cmd:M290 Z-0.025;M42 P4 S0;M42 P5 S0;M42 P6 S255;
 
 #how many "More" button display on screen interface
->morefunc_cnt:2
-
+>morefunc_cnt:6
+#FraKctured: Estos son los botones disponibles cuando ha empezado un trabajo de impresión
+#los ficheros de los iconos correspondientes son: bmp_morefunc1..6
 #command setting on button1~6
+#########################################
+#Apagar leds
 >morefunc1_cmd:M42 P4 S0;M42 P5 S0;M42 P6 S0;
+#Encender leds (todos)
 >morefunc2_cmd:M42 P4 S255;M42 P5 S255;M42 P6 S255;
->morefunc3_cmd:G28;
->morefunc4_cmd:G28;
->morefunc5_cmd:G28;
+#AjustarZ+ (-> verde)
+>morefunc3_cmd:M290 Z0.025;M42 P4 S255;M42 P5 S0;M42 P6 S0;
+#AjustarZ- (-> verde)
+>morefunc4_cmd:M290 Z-0.025;M42 P4 S0;M42 P5 S0;M42 P6 S255;
+#SaveToEEPROM (rojo -> verde)
+>morefunc5_cmd:M42 P4 S0;M42 P5 S255;M42 P6 S0;M500;G4 S1;M42 P4 S255;M42 P5 S0;M42 P6 S0;
+#not used currently
 >morefunc6_cmd:G28;
-
+#########################################
 #---------------------------------------------------------------------------------
 ##### Display Customization(button and logo customized see User's Manual) #######
 
